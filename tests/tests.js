@@ -1,4 +1,5 @@
-tests = {
+var tests = module.exports = {
+	output:null,
 	outputError:null,
 	assert:assert,
 	runFirstPass:runFirstPass,
@@ -7,14 +8,15 @@ tests = {
 }
 
 function assert(truthy, msg) {
+	tests.output('assert: '+msg)
 	if (!truthy) {
-		tests.outputError('bad assert: ' + msg);
-		if (store.disabled) { tests.outputError('<br>Note that store.disabled == true') }
+		tests.outputError('assert failed: ' + msg)
 		tests.failed = true
 	}
 }
 
-function runFirstPass() {
+function runFirstPass(store) {
+	assert(!store.disabled, "store should be enabled")
 	store.clear()
 
 	store.get('unsetValue') // see https://github.com/marcuswestin/store.js/issues/63
@@ -85,10 +87,10 @@ function runFirstPass() {
 			'string'      : "Don't Panic",
 			'odd_string'  : "{ZYX'} abc:;::)))"
 		}
-		for (key in promoteValues) {
-			localStorage[key] = promoteValues[key]
+		for (var key in promoteValues) {
+			localStorage.setItem(key, promoteValues[key])
 		}
-		for (key in promoteValues) {
+		for (var key in promoteValues) {
 			assert(store.get(key) == promoteValues[key], key+" was not correctly promoted to valid JSON")
 			store.remove(key)
 		}
@@ -103,7 +105,7 @@ function runFirstPass() {
 	assert(countProperties(all) == 4, 'getAll gets all 4 values')
 }
 
-function runSecondPass() {
+function runSecondPass(store) {
 	assert(store.get('firstPassFoo') == 'bar', "first pass key 'firstPassFoo' not equal to stored value 'bar'")
 
 	var all = store.getAll()

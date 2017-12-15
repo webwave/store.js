@@ -1,31 +1,16 @@
 "use strict"
-// Module export pattern from
-// https://github.com/umdjs/umd/blob/master/returnExports.js
-;(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define([], factory);
-    } else if (typeof exports === 'object') {
-        // Node. Does not work with strict CommonJS, but
-        // only CommonJS-like environments that support module.exports,
-        // like Node.
-        module.exports = factory();
-    } else {
-        // Browser globals (root is window)
-        root.store = factory();
-  }
-}(this, function () {
-	
+
+module.exports = (function() {
 	// Store.js
 	var store = {},
-		win = window,
+		win = (typeof window != 'undefined' ? window : global),
 		doc = win.document,
 		localStorageName = 'localStorage',
 		scriptTag = 'script',
 		storage
 
 	store.disabled = false
-	store.version = '1.3.17'
+	store.version = '1.3.20'
 	store.set = function(key, value) {}
 	store.get = function(key, defaultVal) {}
 	store.has = function(key) { return store.get(key) !== undefined }
@@ -43,9 +28,14 @@
 		transactionFn(val)
 		store.set(key, val)
 	}
-	store.getAll = function() {}
+	store.getAll = function() {
+		var ret = {}
+		store.forEach(function(key, val) {
+			ret[key] = val
+		})
+		return ret
+	}
 	store.forEach = function() {}
-
 	store.serialize = function(value) {
 		return JSON.stringify(value)
 	}
@@ -76,20 +66,13 @@
 		}
 		store.remove = function(key) { storage.removeItem(key) }
 		store.clear = function() { storage.clear() }
-		store.getAll = function() {
-			var ret = {}
-			store.forEach(function(key, val) {
-				ret[key] = val
-			})
-			return ret
-		}
 		store.forEach = function(callback) {
 			for (var i=0; i<storage.length; i++) {
 				var key = storage.key(i)
 				callback(key, store.get(key))
 			}
 		}
-	} else if (doc.documentElement.addBehavior) {
+	} else if (doc && doc.documentElement.addBehavior) {
 		var storageOwner,
 			storageContainer
 		// Since #userData storage applies only to specific paths, we need to
@@ -157,18 +140,11 @@
 		store.clear = withIEStorage(function(storage) {
 			var attributes = storage.XMLDocument.documentElement.attributes
 			storage.load(localStorageName)
-			while (attributes.length) {
-				storage.removeAttribute(attributes[0].name)
+			for (var i=attributes.length-1; i>=0; i--) {
+				storage.removeAttribute(attributes[i].name)
 			}
 			storage.save(localStorageName)
 		})
-		store.getAll = function(storage) {
-			var ret = {}
-			store.forEach(function(key, val) {
-				ret[key] = val
-			})
-			return ret
-		}
 		store.forEach = withIEStorage(function(storage, callback) {
 			var attributes = storage.XMLDocument.documentElement.attributes
 			for (var i=0, attr; attr=attributes[i]; ++i) {
@@ -188,4 +164,4 @@
 	store.enabled = !store.disabled
 	
 	return store
-}));
+}())

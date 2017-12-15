@@ -172,7 +172,7 @@ alert("We've got " + store.get('tags').length + " tags here")
 
 The native serialization engine of javascript is JSON. Rather than leaving it up to you to serialize and deserialize your values, store.js uses JSON.stringify() and JSON.parse() on each call to store.set() and store.get(), respectively.
 
-Some browsers do not have native support for JSON. For those browsers you should include [JSON.js](non-minified copy is included in this repo).
+Some browsers do not have native support for JSON. For those browsers you should include [JSON2.js] \(non-minified copy is included in this repo).
 
 
 No sessionStorage/auto-expiration?
@@ -197,17 +197,7 @@ setTimeout(function() { console.log(storeWithExpiration.get('foo')) }, 1500) // 
 ```
 
 
-Testing
--------
-For a browser: Go to http://marcuswestin.github.io/store.js/test.html to test the latest version of store.js.
 
-For a browser, locally: do `npm install node-static && ./node_modules/node-static/bin/cli.js` and go to http://localhost:8080
-
-(Note that test.html must be served over http:// or https://. This is because localStore does not work in some browsers when using the file:// protocol.)
-
-For Nodejs: do `npm install . localStorage && node test-node.js`
-
-
-  [JSON.js]: http://www.json.org/json2.js
+  [JSON2.js]: https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
   [store.min.js]: https://raw.github.com/marcuswestin/store.js/master/store.min.js
   [store+json2.min.js]: https://raw.github.com/marcuswestin/store.js/master/store+json2.min.js
